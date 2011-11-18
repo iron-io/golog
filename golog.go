@@ -11,6 +11,8 @@ const (
 	Error
 )
 
+var DefaultLogger = NewLogger()
+
 type Logger struct {
 	Level int
 }
@@ -40,4 +42,17 @@ func (l *Logger) Errorln(a ...interface{}) {
 	if l.Level <= Error {
 		log.Println(a...)
 	}
+}
+
+func Debugln(a ...interface{}) {
+	DefaultLogger.Debugln(a)
+}
+func Infoln(a ...interface{}) {
+	DefaultLogger.Infoln(a)
+}
+func Warnln(a ...interface{}) {
+	DefaultLogger.Warnln(a)
+}
+func Errorln(a ...interface{}) {
+	DefaultLogger.Errorln(a)
 }
