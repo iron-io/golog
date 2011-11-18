@@ -31,3 +31,13 @@ func (l *Logger) Infoln(a ...interface{}) {
 		log.Println(a...)
 	}
 }
+func (l *Logger) Warnln(a ...interface{}) {
+	if l.Level <= Warn {
+		log.Println(a...)
+	}
+}
+func (l *Logger) Errorln(a ...interface{}) {
+	if l.Level <= Error {
+		log.Println(a...)
+	}
+}
