@@ -25,22 +25,23 @@ func NewLogger() *Logger {
 
 func (l *Logger) Debugln(a ...interface{}) {
 	if l.Level <= Debug {
-		log.Println("DEBUG --", a...)
+		// doesn't work: a = append([]interface{"DEBUG --"}, a...) 
+		log.Println(a...)
 	}
 }
 func (l *Logger) Infoln(a ...interface{}) {
 	if l.Level <= Info {
-		log.Println("INFO --", a...)
+		log.Println(a...)
 	}
 }
 func (l *Logger) Warnln(a ...interface{}) {
 	if l.Level <= Warn {
-		log.Println("WARN --", a...)
+		log.Println(a...)
 	}
 }
 func (l *Logger) Errorln(a ...interface{}) {
 	if l.Level <= Error {
-		log.Println("ERROR --", a...)
+		log.Println(a...)
 	}
 }
 
