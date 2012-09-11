@@ -25,49 +25,56 @@ func NewLogger() *Logger {
 
 func (l *Logger) Debugln(a ...interface{}) {
 	if l.Level <= Debug {
-		// doesn't work: a = append([]interface{"DEBUG --"}, a...)
+		a = append([]interface{}{"DEBUG --"}, a...)
 		log.Println(a...)
 	}
 }
 
 func (l *Logger) Debugf(format string, a ...interface{}) {
 	if l.Level <= Debug {
+		a = append([]interface{}{"DEBUG --"}, a...)
 		log.Printf(format, a...)
 	}
 }
 
 func (l *Logger) Infoln(a ...interface{}) {
 	if l.Level <= Info {
+		a = append([]interface{}{"INFO --"}, a...)
 		log.Println(a...)
 	}
 }
 
 func (l *Logger) Infof(format string, a ...interface{}) {
 	if l.Level <= Info {
+		a = append([]interface{}{"INFO --"}, a...)
 		log.Printf(format, a...)
 	}
 }
 
 func (l *Logger) Warnln(a ...interface{}) {
 	if l.Level <= Warn {
+		a = append([]interface{}{"WARN --"}, a...)
 		log.Println(a...)
 	}
 }
 
 func (l *Logger) Warnf(format string, a ...interface{}) {
 	if l.Level <= Warn {
+		a = append([]interface{}{"WARN --"}, a...)
 		log.Printf(format, a...)
 	}
 }
 
 func (l *Logger) Errorln(a ...interface{}) {
 	if l.Level <= Error {
+		a = append([]interface{}{"ERROR --"}, a...)
 		log.Println(a...)
 	}
 }
 
 func (l *Logger) Errorf(format string, a ...interface{}) {
 	if l.Level <= Error {
+		a = append([]interface{}{"ERROR --"}, a...)
 		log.Printf(format, a...)
 	}
 }
