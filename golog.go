@@ -32,8 +32,7 @@ func (l *Logger) Debugln(a ...interface{}) {
 
 func (l *Logger) Debugf(format string, a ...interface{}) {
 	if l.Level <= Debug {
-		a = append([]interface{}{"DEBUG --"}, a...)
-		log.Printf(format, a...)
+		log.Printf("DEBUG -- " + format, a...)
 	}
 }
 
@@ -46,8 +45,7 @@ func (l *Logger) Infoln(a ...interface{}) {
 
 func (l *Logger) Infof(format string, a ...interface{}) {
 	if l.Level <= Info {
-		a = append([]interface{}{"INFO --"}, a...)
-		log.Printf(format, a...)
+		log.Printf("INFO -- " + format, a...)
 	}
 }
 
@@ -60,8 +58,7 @@ func (l *Logger) Warnln(a ...interface{}) {
 
 func (l *Logger) Warnf(format string, a ...interface{}) {
 	if l.Level <= Warn {
-		a = append([]interface{}{"WARN --"}, a...)
-		log.Printf(format, a...)
+		log.Printf("WARN -- " + format, a...)
 	}
 }
 
@@ -74,8 +71,7 @@ func (l *Logger) Errorln(a ...interface{}) {
 
 func (l *Logger) Errorf(format string, a ...interface{}) {
 	if l.Level <= Error {
-		a = append([]interface{}{"ERROR --"}, a...)
-		log.Printf(format, a...)
+		log.Printf("ERROR -- " + format, a...)
 	}
 }
 
