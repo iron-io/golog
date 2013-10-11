@@ -2,7 +2,39 @@ package golog
 
 import (
 	"log"
+	"log/syslog"
 )
+
+type LoggingConfig struct {
+	To     string `json:"to"`
+	Level  string `json:"level"`
+	Prefix string `json:"prefix"`
+}
+
+func SetLogLevel(level string) {
+	switch level {
+	case "debug":
+		DefaultLogger.Level = Debug
+	case "warn":
+		DefaultLogger.Level = Warn
+	case "error":
+		DefaultLogger.Level = Error
+	default:
+		DefaultLogger.Level = Info
+	}
+}
+
+func SetLogLocation(to, prefix string) {
+	switch to {
+	case "":
+	default:
+		writer, err := syslog.Dial("udp", to, syslog.LOG_INFO, prefix)
+		if err != nil {
+			log.Fatalln("unable to connect to Papertrail:", err)
+		}
+		log.SetOutput(writer)
+	}
+}
 
 const (
 	Debug = iota
@@ -32,7 +64,7 @@ func (l *Logger) Debugln(a ...interface{}) {
 
 func (l *Logger) Debugf(format string, a ...interface{}) {
 	if l.Level <= Debug {
-		log.Printf("DEBUG -- " + format, a...)
+		log.Printf("DEBUG -- "+format, a...)
 	}
 }
 
@@ -45,7 +77,7 @@ func (l *Logger) Infoln(a ...interface{}) {
 
 func (l *Logger) Infof(format string, a ...interface{}) {
 	if l.Level <= Info {
-		log.Printf("INFO -- " + format, a...)
+		log.Printf("INFO -- "+format, a...)
 	}
 }
 
@@ -58,7 +90,7 @@ func (l *Logger) Warnln(a ...interface{}) {
 
 func (l *Logger) Warnf(format string, a ...interface{}) {
 	if l.Level <= Warn {
-		log.Printf("WARN -- " + format, a...)
+		log.Printf("WARN -- "+format, a...)
 	}
 }
 
@@ -71,7 +103,7 @@ func (l *Logger) Errorln(a ...interface{}) {
 
 func (l *Logger) Errorf(format string, a ...interface{}) {
 	if l.Level <= Error {
-		log.Printf("ERROR -- " + format, a...)
+		log.Printf("ERROR -- "+format, a...)
 	}
 }
 
