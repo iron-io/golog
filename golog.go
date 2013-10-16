@@ -5,12 +5,6 @@ import (
 	"log/syslog"
 )
 
-type LoggingConfig struct {
-	To     string `json:"to"`
-	Level  string `json:"level"`
-	Prefix string `json:"prefix"`
-}
-
 func SetLogLevel(level string) {
 	switch level {
 	case "debug":
