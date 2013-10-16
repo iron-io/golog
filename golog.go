@@ -30,7 +30,7 @@ func SetLogLocation(to, prefix string) {
 	default:
 		writer, err := syslog.Dial("udp", to, syslog.LOG_INFO, prefix)
 		if err != nil {
-			log.Fatalln("unable to connect to Papertrail:", err)
+			log.Fatalln("unable to connect to ", to, " : ", err)
 		}
 		log.SetOutput(writer)
 	}
