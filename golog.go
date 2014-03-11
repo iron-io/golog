@@ -3,6 +3,7 @@ package golog
 import (
 	"log"
 	"log/syslog"
+	"os"
 )
 
 func SetLogLevel(level string) {
@@ -101,6 +102,11 @@ func (l *Logger) Errorf(format string, a ...interface{}) {
 	}
 }
 
+func (l *Logger) Fatalln(format string, a ...interface{}) {
+	log.Printf("FATAL -- "+format, a...)
+	os.Exit(1)
+}
+
 func Debugln(a ...interface{}) {
 	DefaultLogger.Debugln(a...)
 }
@@ -131,4 +137,8 @@ func Errorln(a ...interface{}) {
 
 func Errorf(format string, a ...interface{}) {
 	DefaultLogger.Errorf(format, a...)
+}
+
+func Fatalln(a ...interface{}) {
+	DefaultLogger.Fatalln(a...)
 }
