@@ -102,8 +102,9 @@ func (l *Logger) Errorf(format string, a ...interface{}) {
 	}
 }
 
-func (l *Logger) Fatalln(format string, a ...interface{}) {
-	log.Printf("FATAL -- "+format, a...)
+func (l *Logger) Fatalln(a ...interface{}) {
+	a = append([]interface{}{"FATAL --"}, a...)
+	log.Println(a...)
 	os.Exit(1)
 }
 
