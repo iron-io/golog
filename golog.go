@@ -3,6 +3,7 @@ package golog
 import (
 	"log"
 	"log/syslog"
+	"strings"
 	"os"
 )
 
@@ -20,14 +21,32 @@ func SetLogLevel(level string) {
 }
 
 func SetLogLocation(to, prefix string) {
-	switch to {
-	case "":
-	default:
-		writer, err := syslog.Dial("udp", to, syslog.LOG_INFO, prefix)
+	if to == "" {
+		Infoln("Log to STDOUT")
+		return
+	}
+	// tos[0] - logging protocol ("tcp" or "udp" - syslog, "file" - log to file)
+	// tos[1] - file location or network address
+	tos := strings.Split(to, "://")
+	if len(tos) != 2 {
+		log.Fatalln("Logging location is wrong:", to)
+	}
+
+	switch tos[0] {
+	case "udp", "tcp": // FIXME: must it be syslog://address.syslog:port ?
+		writer, err := syslog.Dial(tos[0], tos[1], syslog.LOG_INFO, prefix)
 		if err != nil {
-			log.Fatalln("unable to connect to ", to, " : ", err)
+			log.Fatalln("Unable to connect to ", to, " : ", err)
 		}
 		log.SetOutput(writer)
+	case "file":
+		fwriter, err := os.OpenFile(tos[1], os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalln("Cannot open file '", tos[1], "':", err)
+		}
+		log.SetOutput(fwriter)
+	default:
+		log.Fatalln("Unknown logging location protocol:", tos[0])
 	}
 }
 
