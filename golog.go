@@ -3,7 +3,7 @@ package golog
 import (
 	"log"
 	"log/syslog"
-	"strings"
+	"net/url"
 	"os"
 )
 
@@ -22,31 +22,35 @@ func SetLogLevel(level string) {
 
 func SetLogLocation(to, prefix string) {
 	if to == "" {
-		Infoln("Log to STDOUT")
+		Infoln("Log to STDERR")
 		return
 	}
-	// tos[0] - logging protocol ("tcp" or "udp" - syslog, "file" - log to file)
-	// tos[1] - file location or network address
-	tos := strings.Split(to, "://")
-	if len(tos) != 2 {
+
+	url, err := url.Parse(to)
+	if err != nil {
+		log.Fatalln("Error happened when parse logging URL ", to, ":", err)
+	}
+
+	// File URL must contain only `url.Path`. Syslog location must contain only `url.Host`
+	if (url.Host == "" && url.Path == "") || (url.Host != "" && url.Path != "") {
 		log.Fatalln("Logging location is wrong:", to)
 	}
 
-	switch tos[0] {
+	switch url.Scheme {
 	case "udp", "tcp": // FIXME: must it be syslog://address.syslog:port ?
-		writer, err := syslog.Dial(tos[0], tos[1], syslog.LOG_INFO, prefix)
+		writer, err := syslog.Dial(url.Scheme, url.Host, syslog.LOG_INFO, prefix)
 		if err != nil {
 			log.Fatalln("Unable to connect to ", to, " : ", err)
 		}
 		log.SetOutput(writer)
 	case "file":
-		fwriter, err := os.OpenFile(tos[1], os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
+		fwriter, err := os.OpenFile(url.Path, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
 		if err != nil {
-			log.Fatalln("Cannot open file '", tos[1], "':", err)
+			log.Fatalln("Cannot open file '", url.Path, "':", err)
 		}
 		log.SetOutput(fwriter)
 	default:
-		log.Fatalln("Unknown logging location protocol:", tos[0])
+		log.Fatalln("Unknown logging location protocol:", url.Scheme)
 	}
 }
 
