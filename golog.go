@@ -5,6 +5,7 @@ import (
 	"log/syslog"
 	"net/url"
 	"os"
+	"fmt"
 )
 
 func SetLogLevel(level string) {
@@ -26,14 +27,24 @@ func SetLogLocation(to, prefix string) {
 		return
 	}
 
-	url, err := url.Parse(to)
+	pUrl, err := url.Parse(to)
 	if err != nil {
 		log.Fatalln("Error happened when parse logging URL ", to, ":", err)
 	}
 
+	if pUrl.Host == "" && pUrl.Path == "" {
+		log.Println("No scheme on logging url, adding udp://")
+		// this happens when no scheme like udp:// is present
+		to = fmt.Sprintf("udp://%v", to)
+		url, err = url.Parse(to)
+		if err != nil {
+			log.Fatalln("Error happened when parse logging URL ", to, ":", err)
+		}
+	}
+
 	// File URL must contain only `url.Path`. Syslog location must contain only `url.Host`
 	if (url.Host == "" && url.Path == "") || (url.Host != "" && url.Path != "") {
-		log.Fatalln("Logging location is wrong:", to)
+		log.Fatalln("Invalid logging location:", to)
 	}
 
 	switch url.Scheme {
