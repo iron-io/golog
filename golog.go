@@ -5,6 +5,7 @@ import (
 	"log/syslog"
 	"net/url"
 	"os"
+	"fmt"
 )
 
 func SetLogLevel(level string) {
@@ -26,31 +27,41 @@ func SetLogLocation(to, prefix string) {
 		return
 	}
 
-	url, err := url.Parse(to)
+	pUrl, err := url.Parse(to)
 	if err != nil {
 		log.Fatalln("Error happened when parse logging URL ", to, ":", err)
 	}
 
-	// File URL must contain only `url.Path`. Syslog location must contain only `url.Host`
-	if (url.Host == "" && url.Path == "") || (url.Host != "" && url.Path != "") {
-		log.Fatalln("Logging location is wrong:", to)
+	if pUrl.Host == "" && pUrl.Path == "" {
+		log.Println("No scheme on logging url, adding udp://")
+		// this happens when no scheme like udp:// is present
+		to = fmt.Sprintf("udp://%v", to)
+		pUrl, err = url.Parse(to)
+		if err != nil {
+			log.Fatalln("Error happened when parse logging URL ", to, ":", err)
+		}
 	}
 
-	switch url.Scheme {
+	// File URL must contain only `url.Path`. Syslog location must contain only `url.Host`
+	if (pUrl.Host == "" && pUrl.Path == "") || (pUrl.Host != "" && pUrl.Path != "") {
+		log.Fatalln("Invalid logging location:", to)
+	}
+
+	switch pUrl.Scheme {
 	case "udp", "tcp": // FIXME: must it be syslog://address.syslog:port ?
-		writer, err := syslog.Dial(url.Scheme, url.Host, syslog.LOG_INFO, prefix)
+		writer, err := syslog.Dial(pUrl.Scheme, pUrl.Host, syslog.LOG_INFO, prefix)
 		if err != nil {
 			log.Fatalln("Unable to connect to ", to, " : ", err)
 		}
 		log.SetOutput(writer)
 	case "file":
-		fwriter, err := os.OpenFile(url.Path, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
+		fwriter, err := os.OpenFile(pUrl.Path, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
 		if err != nil {
-			log.Fatalln("Cannot open file '", url.Path, "':", err)
+			log.Fatalln("Cannot open file '", pUrl.Path, "':", err)
 		}
 		log.SetOutput(fwriter)
 	default:
-		log.Fatalln("Unknown logging location protocol:", url.Scheme)
+		log.Fatalln("Unknown logging location protocol:", pUrl.Scheme)
 	}
 }
 
