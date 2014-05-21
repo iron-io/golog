@@ -161,6 +161,14 @@ func (l *Logger) Fatalf(format string, a ...interface{}) {
 	os.Exit(1)
 }
 
+func Logln(level int, a ...interface{}) {
+	DefaultLogger.Logln(level, a)
+}
+
+func Logf(level int, format string, a ...interface{}) {
+	DefaultLogger.Logf(level, format, a)
+}
+
 func Debugln(a ...interface{}) {
 	DefaultLogger.Debugln(a...)
 }
