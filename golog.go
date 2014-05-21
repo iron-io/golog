@@ -1,11 +1,19 @@
 package golog
 
 import (
+	"fmt"
 	"log"
 	"log/syslog"
 	"net/url"
 	"os"
-	"fmt"
+)
+
+const (
+	Debug = iota
+	Info
+	Warn
+	Error
+	Fatal
 )
 
 func SetLogLevel(level string) {
@@ -16,9 +24,29 @@ func SetLogLevel(level string) {
 		DefaultLogger.Level = Warn
 	case "error":
 		DefaultLogger.Level = Error
+	case "fatal":
+		DefaultLogger.Level = Fatal
 	default:
 		DefaultLogger.Level = Info
 	}
+}
+
+func levelName(level int) string {
+	switch level {
+	case Debug:
+		return "DEBUG"
+	case Info:
+		return "INFO"
+	case Warn:
+		return "WARN"
+	case Error:
+		return "ERROR"
+	case Fatal:
+		return "FATAL"
+
+	}
+
+	return "???"
 }
 
 func SetLogLocation(to, prefix string) {
@@ -55,7 +83,7 @@ func SetLogLocation(to, prefix string) {
 		}
 		log.SetOutput(writer)
 	case "file":
-		fwriter, err := os.OpenFile(pUrl.Path, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
+		fwriter, err := os.OpenFile(pUrl.Path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
 			log.Fatalln("Cannot open file '", pUrl.Path, "':", err)
 		}
@@ -64,13 +92,6 @@ func SetLogLocation(to, prefix string) {
 		log.Fatalln("Unknown logging location protocol:", pUrl.Scheme)
 	}
 }
-
-const (
-	Debug = iota
-	Info
-	Warn
-	Error
-)
 
 var DefaultLogger = NewLogger()
 
@@ -84,62 +105,68 @@ func NewLogger() *Logger {
 	return l
 }
 
-func (l *Logger) Debugln(a ...interface{}) {
-	if l.Level <= Debug {
-		a = append([]interface{}{"DEBUG --"}, a...)
+func (l *Logger) Logln(level int, a ...interface{}) {
+	if l.Level <= level {
+		a = append([]interface{}{fmt.Sprintf("%v --", levelName(level))}, a...)
 		log.Println(a...)
 	}
+}
+
+func (l *Logger) Logf(level int, format string, a ...interface{}) {
+	if l.Level <= level {
+		// probably a better way to do this
+		log.Printf(fmt.Sprintf("%v --", levelName(level))+format, a...)
+	}
+}
+
+func (l *Logger) Debugln(a ...interface{}) {
+	l.Logln(Debug, a)
 }
 
 func (l *Logger) Debugf(format string, a ...interface{}) {
-	if l.Level <= Debug {
-		log.Printf("DEBUG -- "+format, a...)
-	}
+	l.Logf(Debug, format, a)
 }
 
 func (l *Logger) Infoln(a ...interface{}) {
-	if l.Level <= Info {
-		a = append([]interface{}{"INFO --"}, a...)
-		log.Println(a...)
-	}
+	l.Logln(Info, a)
 }
 
 func (l *Logger) Infof(format string, a ...interface{}) {
-	if l.Level <= Info {
-		log.Printf("INFO -- "+format, a...)
-	}
+	l.Logf(Info, format, a)
 }
 
 func (l *Logger) Warnln(a ...interface{}) {
-	if l.Level <= Warn {
-		a = append([]interface{}{"WARN --"}, a...)
-		log.Println(a...)
-	}
+	l.Logln(Warn, a)
 }
 
 func (l *Logger) Warnf(format string, a ...interface{}) {
-	if l.Level <= Warn {
-		log.Printf("WARN -- "+format, a...)
-	}
+	l.Logf(Warn, format, a)
 }
 
 func (l *Logger) Errorln(a ...interface{}) {
-	if l.Level <= Error {
-		a = append([]interface{}{"ERROR --"}, a...)
-		log.Println(a...)
-	}
+	l.Logln(Error, a)
 }
 
 func (l *Logger) Errorf(format string, a ...interface{}) {
-	if l.Level <= Error {
-		log.Printf("ERROR -- "+format, a...)
-	}
+	l.Logf(Error, format, a)
 }
 
 func (l *Logger) Fatalln(a ...interface{}) {
-	a = append([]interface{}{"FATAL --"}, a...)
-	log.Println(a...)
+	l.Logln(Fatal, a)
 	os.Exit(1)
+}
+
+func (l *Logger) Fatalf(format string, a ...interface{}) {
+	l.Logf(Fatal, format, a)
+	os.Exit(1)
+}
+
+func Logln(level int, a ...interface{}) {
+	DefaultLogger.Logln(level, a)
+}
+
+func Logf(level int, format string, a ...interface{}) {
+	DefaultLogger.Logf(level, format, a)
 }
 
 func Debugln(a ...interface{}) {
@@ -176,4 +203,8 @@ func Errorf(format string, a ...interface{}) {
 
 func Fatalln(a ...interface{}) {
 	DefaultLogger.Fatalln(a...)
+}
+
+func Fatalf(format string, a ...interface{}) {
+	DefaultLogger.Fatalf(format, a...)
 }
