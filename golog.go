@@ -115,58 +115,58 @@ func (l *Logger) Logln(level int, a ...interface{}) {
 func (l *Logger) Logf(level int, format string, a ...interface{}) {
 	if l.Level <= level {
 		// probably a better way to do this
-		log.Printf(fmt.Sprintf("%v --", levelName(level))+format, a...)
+		log.Printf(fmt.Sprintf("%v --", levelName(level))+format, a)
 	}
 }
 
 func (l *Logger) Debugln(a ...interface{}) {
-	l.Logln(Debug, a)
+	l.Logln(Debug, a...)
 }
 
 func (l *Logger) Debugf(format string, a ...interface{}) {
-	l.Logf(Debug, format, a)
+	l.Logf(Debug, format, a...)
 }
 
 func (l *Logger) Infoln(a ...interface{}) {
-	l.Logln(Info, a)
+	l.Logln(Info, a...)
 }
 
 func (l *Logger) Infof(format string, a ...interface{}) {
-	l.Logf(Info, format, a)
+	l.Logf(Info, format, a...)
 }
 
 func (l *Logger) Warnln(a ...interface{}) {
-	l.Logln(Warn, a)
+	l.Logln(Warn, a...)
 }
 
 func (l *Logger) Warnf(format string, a ...interface{}) {
-	l.Logf(Warn, format, a)
+	l.Logf(Warn, format, a...)
 }
 
 func (l *Logger) Errorln(a ...interface{}) {
-	l.Logln(Error, a)
+	l.Logln(Error, a...)
 }
 
 func (l *Logger) Errorf(format string, a ...interface{}) {
-	l.Logf(Error, format, a)
+	l.Logf(Error, format, a...)
 }
 
 func (l *Logger) Fatalln(a ...interface{}) {
-	l.Logln(Fatal, a)
+	l.Logln(Fatal, a...)
 	os.Exit(1)
 }
 
 func (l *Logger) Fatalf(format string, a ...interface{}) {
-	l.Logf(Fatal, format, a)
+	l.Logf(Fatal, format, a...)
 	os.Exit(1)
 }
 
 func Logln(level int, a ...interface{}) {
-	DefaultLogger.Logln(level, a)
+	DefaultLogger.Logln(level, a...)
 }
 
 func Logf(level int, format string, a ...interface{}) {
-	DefaultLogger.Logf(level, format, a)
+	DefaultLogger.Logf(level, format, a...)
 }
 
 func Debugln(a ...interface{}) {
